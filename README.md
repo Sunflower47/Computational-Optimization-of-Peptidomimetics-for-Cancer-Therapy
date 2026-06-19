@@ -124,3 +124,20 @@ The statistical analysis of the molecular docking data provides robust validatio
 * **Statistical Significance:** Because the intervals remain mathematically separated, the observed shift in binding energy (an affinity gain of **1.97 kJ/mol**) is **statistically significant** and cannot be attributed to the stochastic noise or algorithmic variance of the `smina` docking engine.
 
 **Summary:** This clear thermodynamic separation confirms our initial structural hypothesis. Replacing the native phenylalanine residue with a bulkier, non-natural naphthalene analogue successfully improves the ligand's binding profile, proving that a larger hydrophobic volume yields a genuinely tighter and more stable interaction within the Bfl-1 target pocket.
+
+# Usage
+
+
+```bash
+# Convert receptor to PDBQT
+obabel protein.pdb -O protein.pdbqt -xr
+obabel ligand.pdb -O ligand.pdbqt
+obabel -ipdb ligand.pdb -osdf -O ligand.sdf -h
+
+# Minimize the modified peptidomimetic structure
+obabel ligand_mod.sdf -O ligand_mod_min.sdf --gen3d --minimize --ff mmff94 -h
+obabel ligand_mod_min.sdf -opdbqt -O ligand_mod_min.pdbqt
+
+#Docking
+sbatch --array=1-10 smina_docking_unmod.sbatch results_unmod
+sbatch --array=1-10 smina_docking_mod.sbatch results_mod
